@@ -103,6 +103,17 @@ vFullTrack = [min(vThrotT2_Straight1,vBrakeT1_Straight1); vThrotT1_Turn1;...
     min(vThrotT1_Straight2,vBrakeT2_Straight2); vThrotT2_Turn2;...
     min(vThrotT2_Straight3,vBrakeT1_Straight3)];
 
+%% Plot Speed and Acceleration Traces
+
+figure(1)
+plot(xFullTrack,vFullTrack)
+grid on
+title("Full Lap Speed Trace")
+xlabel("Lap Distance (m)")
+ylabel("Vechicle Speed (m/s)")
+xticks(0:100:1500);
+ylim([0,110]);
+
 %% Calculate Laptime
 
 tFullTrack = dxFullTrack ./ vFullTrack;
