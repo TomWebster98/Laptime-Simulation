@@ -1,9 +1,39 @@
 %% Define Vehicle Capability
 
 g = 9.81;
-ayMax = 2*g;
+ayMax = 3.5*g;
 axThrotMax = 2*g;
-axBrakeMax = 2*g;
+axBrakeMax = 3.2*g;
+
+%% Plot GG Diagram
+
+FyGG = linspace(0,ayMax,100);
+FxGG_Throt = sqrt((1-(FyGG/ayMax).^2)*axThrotMax^2);
+FxGG_Brake = sqrt((1-(FyGG/ayMax).^2)*axBrakeMax^2);
+
+Gy_reference = linspace(0,g,100);
+Gx_reference = sqrt(g^2-Gy_reference.^2);
+
+xline(0,'HandleVisibility','off')
+hold on
+yline(0,'HandleVisibility','off')
+plot(Gy_reference,Gx_reference, "LineWidth",1,"Color","k")
+plot(Gy_reference,-Gx_reference, "LineWidth",1,"Color","k",'HandleVisibility','off')
+plot(-Gy_reference,Gx_reference, "LineWidth",1,"Color","k",'HandleVisibility','off')
+plot(-Gy_reference,-Gx_reference, "LineWidth",1,"Color","k",'HandleVisibility','off')
+plot(FyGG, FxGG_Throt, "LineWidth",1,"Color","b")
+plot(-FyGG, FxGG_Throt, "LineWidth",1,"Color","b",'HandleVisibility','off')
+plot(FyGG, -FxGG_Brake, "LineWidth",1,"Color","b",'HandleVisibility','off')
+plot(-FyGG, -FxGG_Brake, "LineWidth",1,"Color","b",'HandleVisibility','off')
+hold off
+grid on
+title("Vehicle GG Plot")
+xlabel("Lateral Acceleration Capability (ms^{-2})")
+ylabel("Longitudinal Acceleration Capability (ms^{-2})")
+ylim([-ceil(axBrakeMax/10)*10, ceil(axThrotMax/10)*10]);
+%xlim([-ceil(ayMax/10)*10, ceil(ayMax/10)*10]);
+legend('1g Reference','Vehicle Limit')
+axis equal
 
 %% Define Track Parameters
 
@@ -106,7 +136,7 @@ vFullTrack = [min(vThrotT2_Straight1,vBrakeT1_Straight1); vThrotT1_Turn1;...
 
 %% Plot Speed and Acceleration Traces
 
-figure(1)
+figure(2)
 plot(xFullTrack,vFullTrack)
 grid on
 title("Full Lap Speed Trace")
