@@ -49,6 +49,8 @@ end
 
 %% On-Throttle from Turn 1 Calculations
 
+% Calculating speeds for Accelerating out of Turn 1
+
 vThrotT1_Turn1 = ones(length(xTurn1),1)*sqrt(ayMax*Turn1_Rad);
 
 vThrotT1_Straight2 = [vThrotT1_Turn1(end), zeros(1,length(dxStraight2)-1)]';
@@ -57,6 +59,8 @@ for i = 2:length(dxStraight2)
 end
 
 %% On-Throttle from Turn 2 Calculations
+
+% Calculating speeds for Accelerating out of Turn 2
 
 vThrotT2_Turn2 = ones(length(xTurn2),1)*sqrt(ayMax*Turn2_Rad);
 
@@ -72,9 +76,31 @@ end
 
 %% On-Brakes to Turn 1 Calculations
 
+% Calculating speeds for Braking into Turn 1
 
+vBrakeT1_Straight1 = [zeros(1,length(dxStraight1)-1), vThrotT1_Turn1(1)]';
+for i = length(dxStraight1)-1:-1:1
+    vBrakeT1_Straight1(i) = sqrt(vBrakeT1_Straight1(i+1)^2 + 2*axMax*dxStraight1(i+1)); 
+end
+
+vBrakeT1_Straight3 = [zeros(1,length(dxStraight3)-1), vBrakeT1_Straight1(1)]';
+for i = length(dxStraight3)-1:-1:1
+    vBrakeT1_Straight3(i) = sqrt(vBrakeT1_Straight3(i+1)^2 + 2*axMax*dxStraight3(i+1)); 
+end
 
 %% On-Brakes to Turn 2 Calculations
 
+% Calculating speeds for Braking into Turn 2
+
+vBrakeT2_Straight2 = [zeros(1,length(dxStraight2)-1), vThrotT2_Turn2(1)]';
+for i = length(dxStraight2)-1:-1:1
+    vBrakeT2_Straight2(i) = sqrt(vBrakeT2_Straight2(i+1)^2 + 2*axMax*dxStraight2(i+1)); 
+end
+
+%% Take Minimum Speeds for all Track Mesh Segments
+
+vFullTrack = [min(vThrotT2_Straight1,vBrakeT1_Straight1); vThrotT1_Turn1;...
+    min(vThrotT1_Straight2,vBrakeT2_Straight2); vThrotT2_Turn2;...
+    min(vThrotT2_Straight3,vBrakeT1_Straight3)];
 
 
