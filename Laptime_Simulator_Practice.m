@@ -103,4 +103,9 @@ vFullTrack = [min(vThrotT2_Straight1,vBrakeT1_Straight1); vThrotT1_Turn1;...
     min(vThrotT1_Straight2,vBrakeT2_Straight2); vThrotT2_Turn2;...
     min(vThrotT2_Straight3,vBrakeT1_Straight3)];
 
+%% Calculate Laptime
 
+tFullTrack = dxFullTrack ./ vFullTrack;
+Final_Laptime = sum(tFullTrack);
+
+disp("Final Laptime = " + Final_Laptime);
