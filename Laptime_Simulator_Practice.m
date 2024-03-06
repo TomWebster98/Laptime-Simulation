@@ -2,7 +2,8 @@
 
 g = 9.81;
 ayMax = 2*g;
-axMax = 2*g;
+axThrotMax = 2*g;
+axBrakeMax = 2*g;
 
 %% Define Track Parameters
 
@@ -55,7 +56,7 @@ vThrotT1_Turn1 = ones(length(xTurn1),1)*sqrt(ayMax*Turn1_Rad);
 
 vThrotT1_Straight2 = [vThrotT1_Turn1(end), zeros(1,length(dxStraight2)-1)]';
 for i = 2:length(dxStraight2)
-    vThrotT1_Straight2(i) = sqrt(vThrotT1_Straight2(i-1)^2 + 2*axMax*dxStraight2(i)); 
+    vThrotT1_Straight2(i) = sqrt(vThrotT1_Straight2(i-1)^2 + 2*axThrotMax*dxStraight2(i)); 
 end
 
 %% On-Throttle from Turn 2 Calculations
@@ -66,12 +67,12 @@ vThrotT2_Turn2 = ones(length(xTurn2),1)*sqrt(ayMax*Turn2_Rad);
 
 vThrotT2_Straight3 = [vThrotT2_Turn2(end), zeros(1,length(dxStraight3)-1)]';
 for i = 2:length(dxStraight3)
-    vThrotT2_Straight3(i) = sqrt(vThrotT2_Straight3(i-1)^2 + 2*axMax*dxStraight3(i)); 
+    vThrotT2_Straight3(i) = sqrt(vThrotT2_Straight3(i-1)^2 + 2*axThrotMax*dxStraight3(i)); 
 end
 
 vThrotT2_Straight1 = [vThrotT2_Straight3(end), zeros(1,length(dxStraight1)-1)]';
 for i = 2:length(dxStraight1)
-    vThrotT2_Straight1(i) = sqrt(vThrotT2_Straight1(i-1)^2 + 2*axMax*dxStraight1(i)); 
+    vThrotT2_Straight1(i) = sqrt(vThrotT2_Straight1(i-1)^2 + 2*axThrotMax*dxStraight1(i)); 
 end
 
 %% On-Brakes to Turn 1 Calculations
@@ -80,12 +81,12 @@ end
 
 vBrakeT1_Straight1 = [zeros(1,length(dxStraight1)-1), vThrotT1_Turn1(1)]';
 for i = length(dxStraight1)-1:-1:1
-    vBrakeT1_Straight1(i) = sqrt(vBrakeT1_Straight1(i+1)^2 + 2*axMax*dxStraight1(i+1)); 
+    vBrakeT1_Straight1(i) = sqrt(vBrakeT1_Straight1(i+1)^2 + 2*axBrakeMax*dxStraight1(i+1)); 
 end
 
 vBrakeT1_Straight3 = [zeros(1,length(dxStraight3)-1), vBrakeT1_Straight1(1)]';
 for i = length(dxStraight3)-1:-1:1
-    vBrakeT1_Straight3(i) = sqrt(vBrakeT1_Straight3(i+1)^2 + 2*axMax*dxStraight3(i+1)); 
+    vBrakeT1_Straight3(i) = sqrt(vBrakeT1_Straight3(i+1)^2 + 2*axBrakeMax*dxStraight3(i+1)); 
 end
 
 %% On-Brakes to Turn 2 Calculations
@@ -94,7 +95,7 @@ end
 
 vBrakeT2_Straight2 = [zeros(1,length(dxStraight2)-1), vThrotT2_Turn2(1)]';
 for i = length(dxStraight2)-1:-1:1
-    vBrakeT2_Straight2(i) = sqrt(vBrakeT2_Straight2(i+1)^2 + 2*axMax*dxStraight2(i+1)); 
+    vBrakeT2_Straight2(i) = sqrt(vBrakeT2_Straight2(i+1)^2 + 2*axBrakeMax*dxStraight2(i+1)); 
 end
 
 %% Take Minimum Speeds for all Track Mesh Segments
@@ -112,11 +113,14 @@ title("Full Lap Speed Trace")
 xlabel("Lap Distance (m)")
 ylabel("Vechicle Speed (m/s)")
 xticks(0:100:1500);
-ylim([0,110]);
+ylim([0, ceil(max(vFullTrack)/10)*10]);
 
-%% Calculate Laptime
+%% Calculate and Display Laptime and Maximum Speed
 
 tFullTrack = dxFullTrack ./ vFullTrack;
 Final_Laptime = sum(tFullTrack);
 
-disp("Final Laptime = " + Final_Laptime);
+vMax = max(vFullTrack);
+
+disp("Final Laptime = " + Final_Laptime + " s");
+disp("Maximum Speed = " + vMax + " m/s " + "(" + vMax*3.6 + " kph)");
