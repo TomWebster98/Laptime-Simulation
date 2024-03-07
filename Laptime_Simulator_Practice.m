@@ -16,6 +16,7 @@ FxGG_Brake = sqrt((1-(FyGG/ayMax).^2)*axBrakeMax^2);
 Gy_reference = linspace(0,g,100);
 Gx_reference = sqrt(g^2-Gy_reference.^2);
 
+figure(1);
 xline(0,'HandleVisibility','off')
 hold on
 yline(0,'HandleVisibility','off')
@@ -172,7 +173,6 @@ for i = 1:length(tFullTrack)
     end
 end
 
-
 %% Plot Speed and Acceleration Traces
 
 figure(2)
@@ -188,12 +188,26 @@ figure(3)
 plot(xFullTrack,LatAcc)
 hold on
 plot(xFullTrack,LongAcc)
+hold off
 grid on
 title("Full Lap Acceleration Trace")
 xlabel("Lap Distance (m)")
 ylabel("Vechicle Acceleration (ms^{-2})")
 xticks(0:100:1500);
 legend('LatAcc', 'LongAcc',"Location","southeast")
+
+figure(4)
+plot(LatAcc,LongAcc,"xr")
+hold on
+plot(FyGG, FxGG_Throt, "LineWidth",1,"Color","b")
+plot(-FyGG, FxGG_Throt, "LineWidth",1,"Color","b",'HandleVisibility','off')
+plot(FyGG, -FxGG_Brake, "LineWidth",1,"Color","b",'HandleVisibility','off')
+plot(-FyGG, -FxGG_Brake, "LineWidth",1,"Color","b",'HandleVisibility','off')
+hold off
+grid on
+title("Resulting GG Trace")
+xlabel("Lateral Acceleration (ms^{-2})")
+ylabel("Longitudinal Acceleration (ms^{-2})")
 
 %% Calculate and Display Laptime and Maximum Speed
 
