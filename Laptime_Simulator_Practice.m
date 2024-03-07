@@ -1,11 +1,13 @@
 %% Define Vehicle Capability
 
 g = 9.81;
-ayMax = 3.5*g;
+ayMax = 2*g;
 axThrotMax = 2*g;
-axBrakeMax = 3.2*g;
+axBrakeMax = 2*g;
 
-%% Plot GG Diagram
+vehTopSpeed = 400/3.6;
+
+%% Plot GG Diagram of Vehicle Limit
 
 FyGG = linspace(0,ayMax,100);
 FxGG_Throt = sqrt((1-(FyGG/ayMax).^2)*axThrotMax^2);
@@ -78,6 +80,12 @@ for i = 2:length(dxFullTrack)
     xFullTrack(i) = xFullTrack(i-1) + dxFullTrack(i);
 end
 
+%% Define Full Track Radius Vector
+
+radFullTrack = [zeros(length(xStraight1),1); ones(length(xTurn1),1).*Turn1_Rad;...
+        zeros(length(xStraight2),1); ones(length(xTurn2),1).*Turn2_Rad;...
+        zeros(length(xStraight3),1)];
+
 %% On-Throttle from Turn 1 Calculations
 
 % Calculating speeds for Accelerating out of Turn 1
@@ -134,6 +142,37 @@ vFullTrack = [min(vThrotT2_Straight1,vBrakeT1_Straight1); vThrotT1_Turn1;...
     min(vThrotT1_Straight2,vBrakeT2_Straight2); vThrotT2_Turn2;...
     min(vThrotT2_Straight3,vBrakeT1_Straight3)];
 
+for i = 1:length(vFullTrack)
+    if vFullTrack(i) > vehTopSpeed
+        vFullTrack(i) = vehTopSpeed;
+    end
+end
+
+%% Calculate Lateral and Longitudinal Accelerations
+
+tFullTrack = dxFullTrack ./ vFullTrack;
+
+% LatAcc Calculation for each Turn
+LatAcc = zeros(length(vFullTrack),1);
+for i = 1:length(radFullTrack)
+    if radFullTrack(i) == 0
+        LatAcc(i) = 0;
+    else
+        LatAcc(i) = vFullTrack(i).^2 ./ radFullTrack(i);
+    end
+end
+
+% LongAcc Calculation
+LongAcc = zeros(length(vFullTrack),1);
+for i = 1:length(tFullTrack)
+    if tFullTrack(i) == 0
+        LongAcc(i) = 0;
+    else
+        LongAcc(i) = (vFullTrack(i) - vFullTrack(i-1))./tFullTrack(i);
+    end
+end
+
+
 %% Plot Speed and Acceleration Traces
 
 figure(2)
@@ -145,9 +184,19 @@ ylabel("Vechicle Speed (m/s)")
 xticks(0:100:1500);
 ylim([0, ceil(max(vFullTrack)/10)*10]);
 
+figure(3)
+plot(xFullTrack,LatAcc)
+hold on
+plot(xFullTrack,LongAcc)
+grid on
+title("Full Lap Acceleration Trace")
+xlabel("Lap Distance (m)")
+ylabel("Vechicle Acceleration (ms^{-2})")
+xticks(0:100:1500);
+legend('LatAcc', 'LongAcc',"Location","southeast")
+
 %% Calculate and Display Laptime and Maximum Speed
 
-tFullTrack = dxFullTrack ./ vFullTrack;
 Final_Laptime = sum(tFullTrack);
 
 vMax = max(vFullTrack);
